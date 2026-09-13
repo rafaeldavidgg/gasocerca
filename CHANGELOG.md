@@ -2,6 +2,13 @@
 
 Todos los cambios notables se documentan aquí. Formato basado en *Keep a Changelog*.
 
+## [0.1.1] - 2026-09-14
+### Corregido
+- El radio de distancia ya no filtra cuando buscas una provincia/municipio lejanos
+  teniendo ubicación fijada: ahora es un interruptor explícito (“Solo a menos de X km
+  de mí”) que se desactiva solo al elegir territorio y se reactiva al pulsar
+  “Usar mi ubicación”. El mensaje de “sin resultados” explica qué hacer.
+
 ## [0.1.0] - 2026-09-13
 ### Añadido
 - Buscador por carburante, provincia y municipio con datos reales del MITERD.
