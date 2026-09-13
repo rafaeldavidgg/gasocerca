@@ -58,6 +58,12 @@ export default function HomeClient() {
   const [favs, setFavs] = useState<string[]>([]);
   const [loc, setLoc] = useState<{ lat: number; lng: number } | null>(null);
   const [geoError, setGeoError] = useState("");
+  /**
+   * ¿Limitar los resultados al radio alrededor de mi ubicación?
+   * Se activa al pulsar "Usar mi ubicación" y se desactiva solo al elegir
+   * provincia/municipio (búsqueda por territorio lejano). Siempre re-activable a mano.
+   */
+  const [limitarRadio, setLimitarRadio] = useState(true);
 
   const [data, setData] = useState<ApiEstaciones | null>(null);
   const [loading, setLoading] = useState(false);
@@ -80,7 +86,10 @@ export default function HomeClient() {
     setGeoError("");
     if (!navigator.geolocation) return setGeoError("Tu navegador no soporta geolocalización.");
     navigator.geolocation.getCurrentPosition(
-      (pos) => setLoc({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
+      (pos) => {
+        setLoc({ lat: pos.coords.latitude, lng: pos.coords.longitude });
+        setLimitarRadio(true);
+      },
       () => setGeoError("Geolocalización denegada. Activa el permiso o busca por municipio."),
       { enableHighAccuracy: true, timeout: 10_000 },
     );
@@ -120,14 +129,14 @@ export default function HomeClient() {
     if (ocultarSinPrecio) arr = arr.filter((x) => x.precio != null);
     if (solo24h) arr = arr.filter((x) => es24h(x.g.horario));
     if (soloFav) arr = arr.filter((x) => favs.includes(x.g.ideess));
-    if (loc) arr = arr.filter((x) => x.dist == null || x.dist <= radio);
+    if (loc && limitarRadio) arr = arr.filter((x) => x.dist == null || x.dist <= radio);
     arr.sort((a, b) =>
       orden === "precio"
         ? (a.precio ?? Infinity) - (b.precio ?? Infinity)
         : (a.dist ?? Infinity) - (b.dist ?? Infinity),
     );
     return arr;
-  }, [data, producto, nombreProducto, loc, radio, orden, solo24h, ocultarSinPrecio, soloFav, favs]);
+  }, [data, producto, nombreProducto, loc, radio, limitarRadio, orden, solo24h, ocultarSinPrecio, soloFav, favs]);
 
   const masBarata = lista[0];
   /** Clave que identifica cada búsqueda: solo entonces el mapa reajusta el zoom. */
@@ -184,7 +193,7 @@ export default function HomeClient() {
             <select
               className="rounded-lg border border-neutral-300 bg-white p-2 dark:border-neutral-700 dark:bg-neutral-900"
               value={idProv}
-              onChange={(e) => { setIdProv(e.target.value); setIdMuni(""); buscarDebounced({ p: e.target.value }); }}
+              onChange={(e) => { setIdProv(e.target.value); setIdMuni(""); setLimitarRadio(false); buscarDebounced({ p: e.target.value }); }}
             >
               <option value="">Todas</option>
               {provincias.map((p) => (
@@ -198,7 +207,7 @@ export default function HomeClient() {
               className="rounded-lg border border-neutral-300 bg-white p-2 dark:border-neutral-700 dark:bg-neutral-900"
               value={idMuni}
               disabled={!idProv}
-              onChange={(e) => { setIdMuni(e.target.value); buscarDebounced({ p: idProv, m: e.target.value }); }}
+              onChange={(e) => { setIdMuni(e.target.value); setLimitarRadio(false); buscarDebounced({ p: idProv, m: e.target.value }); }}
             >
               <option value="">Todos</option>
               {municipios.map((m) => (
@@ -212,7 +221,20 @@ export default function HomeClient() {
           <button onClick={usarUbicacion} className="rounded-full bg-energia-600 px-4 py-2 font-semibold text-white hover:bg-energia-700">
             📍 Usar mi ubicación
           </button>
-          {loc && <span className="text-neutral-600 dark:text-neutral-400">Ubicación lista ✓ (solo se usa en tu móvil)</span>}
+          {loc && (
+            <label
+              className="flex items-center gap-1.5 rounded-full bg-energia-100 px-3 py-1 font-medium dark:bg-energia-900"
+              title="Tu ubicación solo se usa en tu móvil para calcular distancias"
+            >
+              <input
+                type="checkbox"
+                checked={limitarRadio}
+                onChange={(e) => setLimitarRadio(e.target.checked)}
+                className="h-4 w-4 accent-green-600"
+              />
+              Solo a menos de {radio} km de mí
+            </label>
+          )}
           <span className="ml-1" id="radio-label">Radio:</span>
           <div role="group" aria-labelledby="radio-label" className="flex flex-wrap gap-1">
             {RADIOS.map((r) => (
@@ -250,7 +272,14 @@ export default function HomeClient() {
 
       {!loading && !error && data && lista.length === 0 && (
         <p className="rounded-xl border border-dashed border-neutral-300 p-6 text-center dark:border-neutral-700" role="status">
-          Sin resultados con esos filtros. Prueba con más radio o quita “solo 24 h”.
+          {loc && limitarRadio ? (
+            <>
+              Ninguna gasolinera a menos de {radio} km de tu ubicación. Prueba a ampliar el
+              radio o desactiva “Solo a menos de {radio} km de mí”.
+            </>
+          ) : (
+            <>Sin resultados con esos filtros. Prueba con más radio o quita “solo 24 h”.</>
+          )}
         </p>
       )}
       {!loading && !error && !data && (
@@ -266,7 +295,7 @@ export default function HomeClient() {
           </section>
           <section aria-label="Lista de gasolineras">
             <h2 className="mb-2 text-lg font-bold">
-              {lista.length} gasolineras {loc ? `a menos de ${radio} km` : ""}
+              {lista.length} gasolineras {loc && limitarRadio ? `a menos de ${radio} km` : ""}
             </h2>
             <ul className="space-y-3">
               {lista.slice(0, visibles).map(({ g, precio, dist }) => {
