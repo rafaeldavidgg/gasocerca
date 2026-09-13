@@ -23,3 +23,134 @@ body {
 .leaflet-container {
   font: inherit;
 }
+
+/* ---------- Pines propios de GasoCerca (divIcon, sin imágenes) ---------- */
+
+/* Contenedor que genera Leaflet: transparente para no deformar el pin */
+.gc-divicon {
+  background: transparent;
+  border: none;
+}
+
+/* Píldora de precio con puntita inferior tipo pin de mapa */
+.gc-pin {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: #fff;
+  color: #18181b;
+  border: 2px solid #525252;
+  border-radius: 9999px;
+  padding: 4px 10px;
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1.2;
+  white-space: nowrap;
+  box-shadow: 0 1px 6px rgb(0 0 0 / 0.35);
+}
+
+.gc-pin::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: -8px;
+  transform: translateX(-50%);
+  border: 8px solid transparent;
+  border-top-color: #525252;
+  border-bottom: 0;
+}
+
+.gc-pin-ico {
+  font-size: 12px;
+  line-height: 1;
+}
+
+/* Ganadora: verde energía + estrella amarilla, algo más grande y con halo */
+.gc-pin-ganadora {
+  background: #16a34a;
+  border-color: #14532d;
+  color: #fff;
+  font-size: 13px;
+  padding: 5px 12px;
+  box-shadow:
+    0 0 0 3px rgb(22 163 74 / 0.3),
+    0 2px 8px rgb(0 0 0 / 0.4);
+}
+
+.gc-pin-ganadora::after {
+  border-top-color: #14532d;
+}
+
+.gc-pin-ganadora .gc-pin-ico {
+  color: #ffd23f;
+}
+
+/* Punto azul pulsante de "estás aquí" */
+.gc-user {
+  position: relative;
+  width: 28px;
+  height: 28px;
+}
+
+.gc-user-dot {
+  position: absolute;
+  inset: 5px;
+  border-radius: 9999px;
+  background: #2563eb;
+  border: 3px solid #fff;
+  box-shadow: 0 1px 6px rgb(0 0 0 / 0.5);
+}
+
+.gc-user-halo {
+  position: absolute;
+  inset: 5px;
+  border-radius: 9999px;
+  background: rgb(37 99 235 / 0.4);
+  animation: gc-pulse 2s ease-out infinite;
+}
+
+@keyframes gc-pulse {
+  0% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(2.2);
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gc-user-halo {
+    animation: none;
+  }
+}
+
+/* Mini leyenda bajo el mapa */
+.gc-legend {
+  display: inline-grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 9999px;
+  background: #fff;
+  border: 2px solid #525252;
+  font-size: 10px;
+}
+
+.gc-legend-ganadora {
+  background: #16a34a;
+  border-color: #14532d;
+  color: #ffd23f;
+}
+
+.gc-legend-user {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border-radius: 9999px;
+  background: #2563eb;
+  border: 3px solid #fff;
+  box-shadow: 0 0 0 1px #2563eb;
+}
