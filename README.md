@@ -48,7 +48,7 @@ campo `Fecha` de actualización del Ministerio.
 ## Stack exacto
 
 Next.js 14 (App Router) + React 18 + TypeScript strict + pnpm · Tailwind mobile-first ·
-Leaflet + react-leaflet + teselas CARTO Voyager (datos OpenStreetMap, aspecto tipo Google Maps; Google Maps prohibido por ser de pago) ·
+Leaflet + react-leaflet + OpenStreetMap (prohibido Google Maps por ser de pago) ·
 ESLint + Prettier · Vercel.
 
 ## Funcionalidades MVP
