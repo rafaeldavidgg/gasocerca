@@ -58,13 +58,6 @@ export function es24h(horario: string): boolean {
   return /24\s*h/i.test(horario ?? "");
 }
 
-/** ¿Rótulo low-cost? Heurística por nombre. */
-export function esLowCost(rotulo: string): boolean {
-  return /PLENOIL|PETROPRIX|BALLENOIL|GASEXPRESS|LOW\s*COST|E\.LECLERC|ALCAMPO|CARREFOUR|COSTCO|BONAREA/i.test(
-    rotulo ?? "",
-  );
-}
-
 const FAV_KEY = "gasocerca:favoritos:v1";
 
 /** Lee favoritos (IDEESS) de localStorage. */
