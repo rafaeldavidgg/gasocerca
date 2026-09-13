@@ -34,9 +34,6 @@ export default function HeaderClient() {
           </span>
         </Link>
         <nav aria-label="Principal" className="ml-auto flex items-center gap-1 text-sm">
-          <Link href="/" className="rounded px-2 py-1 hover:underline">
-            Buscar
-          </Link>
           <Link href="/legal" className="rounded px-2 py-1 hover:underline">
             Legal
           </Link>

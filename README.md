@@ -8,7 +8,7 @@
 Página web pública, gratis y sin registro, para ver **precios oficiales de carburantes en
 España** y encontrar **la gasolinera más barata cerca de tu ubicación**.
 
-- 🔴 Demo: **https://gasocerca.vercel.app**
+- 🔴 Demo: **https://gasocercamia.vercel.app**
 - 📦 Repo: este mismo (público, MIT).
 - 💰 Coste: 0 € (Vercel free + GitHub free, sin APIs de pago, sin base de datos).
 
@@ -82,7 +82,7 @@ pnpm lint && pnpm typecheck && pnpm build
 1. Sube este repo a GitHub.
 2. En Vercel: *Add New → Project → Import* del repo. Framework: Next.js (autodetectado).
 3. Sin variables obligatorias (hay `.env.example`). Deploy y listo.
-4. Opcional: dominio `gasocerca.vercel.app` (o el tuyo en *Settings → Domains*).
+4. Opcional: dominio `gasocercamia.vercel.app` (o el tuyo en *Settings → Domains*).
 
 ## Estructura de carpetas
 
