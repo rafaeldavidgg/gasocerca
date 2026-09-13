@@ -218,13 +218,7 @@ export default function HomeClient() {
           <button onClick={usarUbicacion} className="rounded-full bg-energia-600 px-4 py-2 font-semibold text-white hover:bg-energia-700">
             📍 Usar mi ubicación
           </button>
-          {loc && (
-            <span className="text-neutral-600 dark:text-neutral-400">
-              📍 Mostrando a menos de {radio} km de ti
-            </span>
-          )}
-          <span className="ml-1" id="radio-label">Radio:</span>
-          <div role="group" aria-labelledby="radio-label" className="flex flex-wrap gap-1">
+          <div role="group" aria-label="Radio de búsqueda en kilómetros" className="flex flex-wrap gap-1">
             {RADIOS.map((r) => (
               <button
                 key={r}
@@ -236,6 +230,11 @@ export default function HomeClient() {
               </button>
             ))}
           </div>
+          {loc && (
+            <span className="text-neutral-600 dark:text-neutral-400">
+              Mostrando a menos de {radio} km de ti
+            </span>
+          )}
           <label className="ml-1 flex items-center gap-1">
             Orden
             <select value={orden} onChange={(e) => setOrden(e.target.value as Orden)} className="rounded-lg border border-neutral-300 bg-white p-1.5 dark:border-neutral-700 dark:bg-neutral-900">
