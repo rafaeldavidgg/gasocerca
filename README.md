@@ -60,7 +60,7 @@ ESLint + Prettier · Vercel.
 5. Detalle por gasolinera (`/estacion/[ideess]`).
 6. Estados de carga, error (caída MITERD), vacío y aviso si deniegan geolocalización.
 7. Cabecera/footer con “Fuente: MITERD / datos.gob.es · Fecha: […]” + enlaces.
-8. Extras: solo 24h, solo low-cost, ocultar sin precio, favoritas en localStorage,
+8. Extras: solo 24h, ocultar sin precio, favoritas en localStorage,
    compartir por WhatsApp, modo oscuro/claro, PWA instalable mínima, teclado + lector de pantalla.
 
 ## Cómo ejecutar en local

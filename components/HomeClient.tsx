@@ -9,7 +9,6 @@ import {
   PRECIO_KEY_POR_PRODUCTO,
   enlaceWhatsApp,
   es24h,
-  esLowCost,
   etiquetaProducto,
   fmtDist,
   fmtPrecio,
@@ -56,7 +55,6 @@ export default function HomeClient() {
   const [radio, setRadio] = useState(10);
   const [orden, setOrden] = useState<Orden>("precio");
   const [solo24h, setSolo24h] = useState(false);
-  const [soloLow, setSoloLow] = useState(false);
   const [ocultarSinPrecio, setOcultarSinPrecio] = useState(true);
   const [soloFav, setSoloFav] = useState(false);
   const [favs, setFavs] = useState<string[]>([]);
@@ -124,7 +122,6 @@ export default function HomeClient() {
     }));
     if (ocultarSinPrecio) arr = arr.filter((x) => x.precio != null);
     if (solo24h) arr = arr.filter((x) => es24h(x.g.horario));
-    if (soloLow) arr = arr.filter((x) => esLowCost(x.g.rotulo));
     if (soloFav) arr = arr.filter((x) => favs.includes(x.g.ideess));
     if (loc) arr = arr.filter((x) => x.dist == null || x.dist <= radio);
     arr.sort((a, b) =>
@@ -133,7 +130,7 @@ export default function HomeClient() {
         : (a.dist ?? Infinity) - (b.dist ?? Infinity),
     );
     return arr;
-  }, [data, producto, nombreProducto, loc, radio, orden, solo24h, soloLow, ocultarSinPrecio, soloFav, favs]);
+  }, [data, producto, nombreProducto, loc, radio, orden, solo24h, ocultarSinPrecio, soloFav, favs]);
 
   const masBarata = lista[0];
   const provFiltradas = idCCAA ? provincias.filter((p) => p.IDCCAA === idCCAA) : provincias;
@@ -258,7 +255,6 @@ export default function HomeClient() {
 
         <div className="flex flex-wrap gap-3 text-sm">
           <label className="flex items-center gap-1.5"><input type="checkbox" checked={solo24h} onChange={(e) => setSolo24h(e.target.checked)} className="h-4 w-4 accent-green-600" /> Solo 24 h</label>
-          <label className="flex items-center gap-1.5"><input type="checkbox" checked={soloLow} onChange={(e) => setSoloLow(e.target.checked)} className="h-4 w-4 accent-green-600" /> Solo low-cost</label>
           <label className="flex items-center gap-1.5"><input type="checkbox" checked={ocultarSinPrecio} onChange={(e) => setOcultarSinPrecio(e.target.checked)} className="h-4 w-4 accent-green-600" /> Ocultar sin precio</label>
           <label className="flex items-center gap-1.5"><input type="checkbox" checked={soloFav} onChange={(e) => setSoloFav(e.target.checked)} className="h-4 w-4 accent-green-600" /> ⭐ Solo favoritas</label>
         </div>
