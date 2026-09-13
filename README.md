@@ -1,6 +1,6 @@
 # ⛽ GasoCerca — Gasolineras más baratas cerca de ti
 
-![build](https://github.com/tu-usuario/gasocerca/actions/workflows/ci.yml/badge.svg)
+![build](https://github.com/rafaeldavidgg/gasocerca/actions/workflows/ci.yml/badge.svg)
 ![license](https://img.shields.io/badge/license-MIT-green)
 ![vercel](https://img.shields.io/badge/deploy-Vercel-black)
 ![datos](https://img.shields.io/badge/datos-MITERD_oficial-blue)
@@ -11,8 +11,6 @@ España** y encontrar **la gasolinera más barata cerca de tu ubicación**.
 - 🔴 Demo: **https://gasocerca.vercel.app**
 - 📦 Repo: este mismo (público, MIT).
 - 💰 Coste: 0 € (Vercel free + GitHub free, sin APIs de pago, sin base de datos).
-
-> Tono cercano, mobile-first y usable hasta en un móvil flojo.
 
 ## Fuente de datos oficial (obligatoria y exclusiva)
 
