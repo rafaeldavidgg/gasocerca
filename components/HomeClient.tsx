@@ -2,7 +2,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
-import type { ApiEstaciones, CCAA, Gasolinera, Municipio, Orden, Producto, Provincia } from "@/types";
+import type { ApiEstaciones, Gasolinera, Municipio, Orden, Producto, Provincia } from "@/types";
 import { api } from "@/lib/api";
 import { haversineKm } from "@/lib/geo";
 import {
@@ -43,13 +43,11 @@ function precioDe(g: Gasolinera, idProducto: string, nombre?: string): number | 
 /** Página principal: buscador + lista + mapa. */
 export default function HomeClient() {
   const [productos, setProductos] = useState<Producto[]>([]);
-  const [ccaa, setCCAA] = useState<CCAA[]>([]);
   const [provincias, setProvincias] = useState<Provincia[]>([]);
   const [municipios, setMunicipios] = useState<Municipio[]>([]);
 
   const [producto, setProducto] = useState("1");
   const [nombreProducto, setNombreProducto] = useState("Gasolina 95 E5");
-  const [idCCAA, setIdCCAA] = useState("");
   const [idProv, setIdProv] = useState("");
   const [idMuni, setIdMuni] = useState("");
   const [radio, setRadio] = useState(10);
@@ -70,7 +68,6 @@ export default function HomeClient() {
   useEffect(() => {
     setFavs(leerFavoritos());
     api.productos().then((p) => setProductos(p)).catch(() => {});
-    api.ccaa().then(setCCAA).catch(() => {});
     api.provincias().then(setProvincias).catch(() => {});
   }, []);
 
@@ -133,7 +130,8 @@ export default function HomeClient() {
   }, [data, producto, nombreProducto, loc, radio, orden, solo24h, ocultarSinPrecio, soloFav, favs]);
 
   const masBarata = lista[0];
-  const provFiltradas = idCCAA ? provincias.filter((p) => p.IDCCAA === idCCAA) : provincias;
+  /** Clave que identifica cada búsqueda: solo entonces el mapa reajusta el zoom. */
+  const ajustarKey = `${data?.cachedAt ?? "nada"}|${data?.count ?? 0}|${loc ? `${loc.lat.toFixed(4)},${loc.lng.toFixed(4)}` : "sin-loc"}`;
 
   return (
     <div className="space-y-4">
@@ -161,7 +159,7 @@ export default function HomeClient() {
       )}
 
       <section aria-label="Filtros de búsqueda" className="grid gap-3 rounded-2xl border border-neutral-200 p-4 dark:border-neutral-800">
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           <label className="grid gap-1 text-sm">
             Carburante
             <select
@@ -182,19 +180,6 @@ export default function HomeClient() {
             </select>
           </label>
           <label className="grid gap-1 text-sm">
-            Comunidad autónoma
-            <select
-              className="rounded-lg border border-neutral-300 bg-white p-2 dark:border-neutral-700 dark:bg-neutral-900"
-              value={idCCAA}
-              onChange={(e) => { setIdCCAA(e.target.value); setIdProv(""); setIdMuni(""); }}
-            >
-              <option value="">Toda España</option>
-              {ccaa.map((c) => (
-                <option key={c.IDCCAA} value={c.IDCCAA}>{c.CCAA}</option>
-              ))}
-            </select>
-          </label>
-          <label className="grid gap-1 text-sm">
             Provincia
             <select
               className="rounded-lg border border-neutral-300 bg-white p-2 dark:border-neutral-700 dark:bg-neutral-900"
@@ -202,7 +187,7 @@ export default function HomeClient() {
               onChange={(e) => { setIdProv(e.target.value); setIdMuni(""); buscarDebounced({ p: e.target.value }); }}
             >
               <option value="">Todas</option>
-              {provFiltradas.map((p) => (
+              {provincias.map((p) => (
                 <option key={p.IDPovincia} value={p.IDPovincia}>{p.Provincia}</option>
               ))}
             </select>
@@ -277,7 +262,7 @@ export default function HomeClient() {
       {lista.length > 0 && (
         <div className="grid gap-4 lg:grid-cols-2">
           <section aria-label="Mapa de gasolineras" className="lg:sticky lg:top-16 lg:self-start">
-            <Mapa puntos={lista.slice(0, 200).map((x) => ({ g: x.g, precio: x.precio, dist: x.dist }))} loc={loc} idBarata={masBarata?.g.ideess} onCentrar={usarUbicacion} />
+            <Mapa puntos={lista.slice(0, 200).map((x) => ({ g: x.g, precio: x.precio, dist: x.dist }))} loc={loc} idBarata={masBarata?.g.ideess} ajustarKey={ajustarKey} onCentrar={usarUbicacion} />
           </section>
           <section aria-label="Lista de gasolineras">
             <h2 className="mb-2 text-lg font-bold">
