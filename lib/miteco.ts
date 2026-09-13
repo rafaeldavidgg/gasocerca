@@ -96,7 +96,7 @@ async function fetchMiteco<T>(path: string): Promise<T> {
     const res = await fetch(url, {
       signal: ctrl.signal,
       headers: {
-        "User-Agent": "GasoCerca/1.0 (+https://gasocerca.vercel.app; contacto público vía GitHub)",
+        "User-Agent": "GasoCerca/1.0 (+https://gasocercamia.vercel.app; contacto público vía GitHub)",
         Accept: "application/json",
       },
       cache: "no-store",
