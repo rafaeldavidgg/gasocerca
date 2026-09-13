@@ -1,5 +1,5 @@
 "use client";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { MapContainer, Marker, Popup, TileLayer, useMap } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
@@ -53,11 +53,40 @@ function iconoUsuario(): L.DivIcon {
   });
 }
 
-function Centrar({ loc }: { loc: { lat: number; lng: number } | null }) {
+/**
+ * Ajusta el zoom/encuadre a las gasolineras visibles (más tu ubicación si la hay)
+ * cada vez que llega una búsqueda nueva (`ajustarKey`). No se dispara al mover
+ * el mapa a mano ni al paginar: solo cuando cambia la búsqueda o la ubicación.
+ */
+function AjustarVista({
+  puntos,
+  loc,
+  ajustarKey,
+}: {
+  puntos: Punto[];
+  loc: { lat: number; lng: number } | null;
+  ajustarKey: string;
+}) {
   const map = useMap();
+  // Ref para leer los últimos datos dentro del efecto sin re-dispararlo en cada render.
+  const actual = useRef({ puntos, loc });
+  actual.current = { puntos, loc };
   useEffect(() => {
-    if (loc) map.flyTo([loc.lat, loc.lng], 12, { duration: 0.8 });
-  }, [loc, map]);
+    const { puntos: pts, loc: l } = actual.current;
+    const coords: Array<[number, number]> = [];
+    for (const p of pts) {
+      if (p.g.lat != null && p.g.lng != null) coords.push([p.g.lat, p.g.lng]);
+    }
+    if (l) coords.push([l.lat, l.lng]);
+    if (coords.length === 0) return;
+    const primero = coords[0];
+    if (coords.length === 1 && primero) {
+      map.flyTo(primero, 14, { duration: 0.8 });
+      return;
+    }
+    map.fitBounds(L.latLngBounds(coords), { padding: [48, 48], maxZoom: 14 });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [map, ajustarKey]);
   return null;
 }
 
@@ -66,11 +95,13 @@ export default function MapaGasolineras({
   puntos,
   loc,
   idBarata,
+  ajustarKey,
   onCentrar,
 }: {
   puntos: Punto[];
   loc: { lat: number; lng: number } | null;
   idBarata?: string;
+  ajustarKey: string;
   onCentrar: () => void;
 }) {
   const conCoord = puntos.filter((p) => p.g.lat != null && p.g.lng != null);
@@ -91,10 +122,12 @@ export default function MapaGasolineras({
         aria-label="Mapa de gasolineras"
       >
         <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-          url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>'
+          url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
+          subdomains="abcd"
+          maxZoom={20}
         />
-        <Centrar loc={loc} />
+        <AjustarVista puntos={puntos} loc={loc} ajustarKey={ajustarKey} />
         {loc && (
           <Marker position={[loc.lat, loc.lng]} icon={iconoUsuario()} zIndexOffset={2000}>
             <Popup>📍 Estás aquí</Popup>

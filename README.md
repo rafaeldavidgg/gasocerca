@@ -48,13 +48,13 @@ campo `Fecha` de actualización del Ministerio.
 ## Stack exacto
 
 Next.js 14 (App Router) + React 18 + TypeScript strict + pnpm · Tailwind mobile-first ·
-Leaflet + react-leaflet + OpenStreetMap (prohibido Google Maps por ser de pago) ·
+Leaflet + react-leaflet + teselas CARTO Voyager (datos OpenStreetMap, aspecto tipo Google Maps; Google Maps prohibido por ser de pago) ·
 ESLint + Prettier · Vercel.
 
 ## Funcionalidades MVP
 
 1. Selector de carburante (de `Listados/ProductosPetroliferos`).
-2. CCAA → Provincia → Municipio en cascada + “Usar mi ubicación” + radio 3/5/10/25/50 km.
+2. Provincia → Municipio (todas las provincias a la vista, sin paso previo por CCAA) + “Usar mi ubicación” + radio 3/5/10/25/50 km.
 3. Lista ordenable por precio/distancia (Rótulo, dirección, horario, precio grande, distancia).
 4. Mapa responsive con pines, popup, centrado y la más barata destacada en verde.
 5. Detalle por gasolinera (`/estacion/[ideess]`).
