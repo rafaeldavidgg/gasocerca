@@ -8,7 +8,7 @@
 Página web pública, gratis y sin registro, para ver **precios oficiales de carburantes en
 España** y encontrar **la gasolinera más barata cerca de tu ubicación**.
 
-- 🔴 Demo: **https://gasocercamia.vercel.app**
+- 🔴 Demo: **https://gasocerca.vercel.app**
 - 📦 Repo: este mismo (público, MIT).
 - 💰 Coste: 0 € (Vercel free + GitHub free, sin APIs de pago, sin base de datos).
 
@@ -29,7 +29,7 @@ tipo de venta, margen y precios como `Precio Gasolina 95 E5`, `Precio Gasoleo A`
 venden ese carburante → se convierten a `number | null`. Siempre se guarda y muestra el
 campo `Fecha` de actualización del Ministerio.
 
-## Arquitectura (opción 2: frontend + backend ligero, sin BBDD)
+## Arquitectura (frontend + backend ligero, sin BBDD)
 
 ```text
 [Móvil/PC] --fetch--> [Vercel: Next.js /api/*] --fetch+cache 15min--> [MITERD oficial]
@@ -82,7 +82,7 @@ pnpm lint && pnpm typecheck && pnpm build
 1. Sube este repo a GitHub.
 2. En Vercel: *Add New → Project → Import* del repo. Framework: Next.js (autodetectado).
 3. Sin variables obligatorias (hay `.env.example`). Deploy y listo.
-4. Opcional: dominio `gasocercamia.vercel.app` (o el tuyo en *Settings → Domains*).
+4. Opcional: dominio `gasocerca.vercel.app` (o el tuyo en *Settings → Domains*).
 
 ## Estructura de carpetas
 
@@ -111,13 +111,6 @@ pnpm lint && pnpm typecheck && pnpm build
 La geolocalización se procesa solo en tu móvil para calcular distancias: no se guarda ni
 se envía al servidor (no hay BBDD). Favoritas y tema en tu `localStorage`. Sin cookies de
 rastreo, sin registro. Más en [/legal](./app/legal/page.tsx).
-
-## Roadmap (fuera del MVP, dejado preparado)
-
-- [ ] Histórico de precios por estación.
-- [ ] Puntos de recarga eléctrica.
-- [ ] Apps móviles.
-- [ ] Lighthouse móvil > 90 en CI.
 
 ## Licencia y atribución
 
