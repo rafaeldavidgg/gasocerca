@@ -155,7 +155,14 @@ export default function HomeClient() {
     return arr;
   }, [data, producto, nombreProducto, loc, radio, orden, solo24h, ocultarSinPrecio, soloFav, favs]);
 
-  const masBarata = lista[0];
+  const precioMinimo = useMemo(() => {
+    let min: number | null = null;
+    for (const x of lista) {
+      if (x.precio == null) continue;
+      if (min == null || x.precio < min) min = x.precio;
+    }
+    return min;
+  }, [lista]);
   /** Clave que identifica cada búsqueda: solo entonces el mapa reajusta el zoom. */
   const ajustarKey = `${data?.cachedAt ?? "nada"}|${data?.count ?? 0}|${loc ? `${loc.lat.toFixed(4)},${loc.lng.toFixed(4)}` : "sin-loc"}`;
 
@@ -396,7 +403,7 @@ export default function HomeClient() {
             <Mapa
               puntos={lista.slice(0, 200).map((x) => ({ g: x.g, precio: x.precio, dist: x.dist }))}
               loc={loc}
-              idBarata={masBarata?.g.ideess}
+              precioMinimo={precioMinimo}
               ajustarKey={ajustarKey}
               onCentrar={usarUbicacion}
             />
@@ -408,7 +415,7 @@ export default function HomeClient() {
             </h2>
             <ul className="space-y-3">
               {lista.slice(0, visibles).map(({ g, precio, dist }) => {
-                const esBarata = masBarata?.g.ideess === g.ideess;
+                const esBarata = precio != null && precioMinimo != null && precio === precioMinimo;
                 const fav = favs.includes(g.ideess);
                 return (
                   <li

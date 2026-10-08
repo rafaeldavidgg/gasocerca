@@ -97,17 +97,17 @@ function AjustarVista({
   return null;
 }
 
-/** Mapa OSM con pines de precio. La más barata destaca en verde con ★. */
+/** Mapa OSM con pines de precio. Las más baratas (empatadas al mínimo) destacan en verde con ★. */
 export default function MapaGasolineras({
   puntos,
   loc,
-  idBarata,
+  precioMinimo,
   ajustarKey,
   onCentrar,
 }: {
   puntos: Punto[];
   loc: { lat: number; lng: number } | null;
-  idBarata?: string;
+  precioMinimo?: number | null;
   ajustarKey: string;
   onCentrar: () => void;
 }) {
@@ -138,7 +138,7 @@ export default function MapaGasolineras({
           </Marker>
         )}
         {conCoord.map(({ g, precio, dist }) => {
-          const ganadora = g.ideess === idBarata;
+          const ganadora = precio != null && precioMinimo != null && precio === precioMinimo;
           return (
             <Marker
               key={g.ideess}
