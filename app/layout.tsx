@@ -1,16 +1,28 @@
 import type { Metadata, Viewport } from "next";
+import { Anton, Archivo, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 
 const BASE_URL = "https://gasocerca.vercel.app";
 
+const display = Anton({ weight: "400", subsets: ["latin"], variable: "--font-display" });
+const sans = Archivo({ subsets: ["latin"], variable: "--font-sans" });
+const mono = JetBrains_Mono({ subsets: ["latin"], variable: "--font-mono" });
+
 export const metadata: Metadata = {
   metadataBase: new URL(BASE_URL),
   title: "GasoCerca - Gasolineras más baratas cerca de ti | Precios oficiales",
   description:
     "Encuentra la gasolina y el diésel más baratos cerca de ti con precios oficiales del Ministerio (MITERD), actualizados a diario. Sin registro, gratis y con mapa.",
-  keywords: ["gasolineras baratas", "precio gasolina", "precio diésel", "MITERD", "gasóleo barato", "GLP"],
+  keywords: [
+    "gasolineras baratas",
+    "precio gasolina",
+    "precio diésel",
+    "MITERD",
+    "gasóleo barato",
+    "GLP",
+  ],
   alternates: { canonical: BASE_URL },
   openGraph: {
     type: "website",
@@ -24,7 +36,8 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "GasoCerca - Gasolineras más baratas cerca de ti",
-    description: "Precios oficiales MITERD, mapa y la más barata cerca de ti. Gratis, sin registro.",
+    description:
+      "Precios oficiales MITERD, mapa y la más barata cerca de ti. Gratis, sin registro.",
     images: ["/logo.svg"],
   },
   icons: { icon: "/favicon.svg", apple: "/favicon.svg" },
@@ -33,17 +46,17 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   themeColor: [
     { media: "(prefers-color-scheme: light)", color: "#16a34a" },
-    { media: "(prefers-color-scheme: dark)", color: "#052e16" },
+    { media: "(prefers-color-scheme: dark)", color: "#10160f" },
   ],
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="es">
-      <body className="flex min-h-screen flex-col">
+    <html lang="es" className={`${display.variable} ${sans.variable} ${mono.variable}`}>
+      <body className="flex min-h-screen flex-col font-sans">
         <a
           href="#contenido"
-          className="sr-only focus:not-sr-only focus:absolute focus:left-2 focus:top-2 focus:z-[1000] focus:rounded focus:bg-energia-600 focus:px-3 focus:py-2 focus:text-white"
+          className="sr-only focus:not-sr-only focus:absolute focus:left-2 focus:top-2 focus:z-[1000] focus:rounded-xl focus:border-2 focus:border-tinta focus:bg-white focus:px-3 focus:py-2 focus:font-bold focus:text-tinta"
         >
           Saltar al contenido
         </a>

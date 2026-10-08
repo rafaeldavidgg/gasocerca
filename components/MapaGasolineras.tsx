@@ -72,6 +72,9 @@ function AjustarVista({
   const actual = useRef({ puntos, loc });
   actual.current = { puntos, loc };
   useEffect(() => {
+    const reduceMotion =
+      typeof window !== "undefined" &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const { puntos: pts, loc: l } = actual.current;
     const coords: Array<[number, number]> = [];
     for (const p of pts) {
@@ -81,10 +84,14 @@ function AjustarVista({
     if (coords.length === 0) return;
     const primero = coords[0];
     if (coords.length === 1 && primero) {
-      map.flyTo(primero, 14, { duration: 0.8 });
+      map.flyTo(primero, 14, { duration: reduceMotion ? 0 : 0.8 });
       return;
     }
-    map.fitBounds(L.latLngBounds(coords), { padding: [48, 48], maxZoom: 14 });
+    map.fitBounds(L.latLngBounds(coords), {
+      padding: [48, 48],
+      maxZoom: 14,
+      animate: !reduceMotion,
+    });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [map, ajustarKey]);
   return null;
@@ -105,15 +112,14 @@ export default function MapaGasolineras({
   onCentrar: () => void;
 }) {
   const conCoord = puntos.filter((p) => p.g.lat != null && p.g.lng != null);
-  const centro: [number, number] =
-    loc
-      ? [loc.lat, loc.lng]
-      : conCoord[0]?.g.lat != null
-        ? [conCoord[0].g.lat as number, conCoord[0].g.lng as number]
-        : [40.4168, -3.7038];
+  const centro: [number, number] = loc
+    ? [loc.lat, loc.lng]
+    : conCoord[0]?.g.lat != null
+      ? [conCoord[0].g.lat as number, conCoord[0].g.lng as number]
+      : [40.4168, -3.7038];
 
   return (
-    <div className="overflow-hidden rounded-2xl border border-neutral-200 dark:border-neutral-800">
+    <div className="gc-ticket overflow-hidden rounded-ticket bg-white dark:bg-neutral-950">
       <MapContainer
         center={centro}
         zoom={loc ? 12 : 6}
@@ -141,31 +147,40 @@ export default function MapaGasolineras({
               zIndexOffset={ganadora ? 1000 : 0}
             >
               <Popup>
-                <strong>
-                  {ganadora && "★ Más barata · "}
-                  {g.rotulo}
-                </strong>
-                <br />
-                {fmtPrecio(precio)}
-                {dist != null && ` · ${fmtDist(dist)}`}
-                <br />
-                {g.direccion}, {g.municipio}
-                <br />
-                <a href={`/estacion/${g.ideess}?provincia=${g.idProvincia}`}>Ver detalle →</a>
+                <div style={{ minWidth: 160 }}>
+                  <p style={{ fontWeight: 800, lineHeight: 1.2 }}>
+                    {ganadora && "★ Más barata · "}
+                    {g.rotulo}
+                  </p>
+                  <p style={{ fontVariantNumeric: "tabular-nums", fontWeight: 700 }}>
+                    {fmtPrecio(precio)}
+                    {dist != null && ` · ${fmtDist(dist)}`}
+                  </p>
+                  <p style={{ fontSize: 12 }}>
+                    {g.direccion}, {g.municipio}
+                  </p>
+                  <a href={`/estacion/${g.ideess}?provincia=${g.idProvincia}`}>Ver detalle →</a>
+                </div>
               </Popup>
             </Marker>
           );
         })}
       </MapContainer>
       <div
-        className="flex flex-wrap items-center gap-x-4 gap-y-1 border-t border-neutral-200 bg-white px-3 py-2 text-xs text-neutral-600 dark:border-neutral-800 dark:bg-neutral-950 dark:text-neutral-400"
+        className="flex flex-wrap items-center gap-x-4 gap-y-1 border-t-2 border-dashed border-tinta/25 bg-papel px-3 py-2 text-xs font-semibold text-tinta dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-200"
         aria-label="Leyenda del mapa"
       >
         <span className="flex items-center gap-1.5">
-          <span className="gc-legend gc-legend-ganadora" aria-hidden="true">★</span> Más barata
+          <span className="gc-legend gc-legend-ganadora" aria-hidden="true">
+            ★
+          </span>{" "}
+          Más barata
         </span>
         <span className="flex items-center gap-1.5">
-          <span className="gc-legend" aria-hidden="true">⛽</span> Gasolinera
+          <span className="gc-legend" aria-hidden="true">
+            ⛽
+          </span>{" "}
+          Gasolinera
         </span>
         <span className="flex items-center gap-1.5">
           <span className="gc-legend-user" aria-hidden="true" />
@@ -174,7 +189,7 @@ export default function MapaGasolineras({
       </div>
       <button
         onClick={onCentrar}
-        className="w-full bg-neutral-100 p-2 text-sm font-semibold hover:bg-neutral-200 dark:bg-neutral-900 dark:hover:bg-neutral-800"
+        className="gc-press w-full border-t-2 border-tinta bg-energia-600 p-2 text-sm font-bold uppercase tracking-widest text-white hover:bg-energia-700 dark:border-neutral-700"
       >
         🎯 Centrar en mi ubicación
       </button>

@@ -15,12 +15,20 @@ import {
   leerFavoritos,
   toggleFavorito,
 } from "@/lib/app";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Alert } from "@/components/ui/alert";
+import { Empty } from "@/components/ui/empty";
+import { Field, FieldSelect } from "@/components/ui/field";
 
 const Mapa = dynamic(() => import("@/components/MapaGasolineras"), {
   ssr: false,
   loading: () => (
-    <div className="grid h-72 place-items-center rounded-xl bg-neutral-100 dark:bg-neutral-900" role="status">
-      Cargando mapa…
+    <div
+      className="gc-ticket grid h-72 place-items-center rounded-ticket bg-white dark:bg-neutral-950"
+      role="status"
+    >
+      <p className="font-display uppercase tracking-wide">Cargando mapa…</p>
     </div>
   ),
 });
@@ -67,13 +75,22 @@ export default function HomeClient() {
 
   useEffect(() => {
     setFavs(leerFavoritos());
-    api.productos().then((p) => setProductos(p)).catch(() => {});
-    api.provincias().then(setProvincias).catch(() => {});
+    api
+      .productos()
+      .then((p) => setProductos(p))
+      .catch(() => {});
+    api
+      .provincias()
+      .then(setProvincias)
+      .catch(() => {});
   }, []);
 
   useEffect(() => {
     if (!idProv) return setMunicipios([]);
-    api.municipios(idProv).then(setMunicipios).catch(() => setMunicipios([]));
+    api
+      .municipios(idProv)
+      .then(setMunicipios)
+      .catch(() => setMunicipios([]));
   }, [idProv]);
 
   const usarUbicacion = () => {
@@ -88,7 +105,7 @@ export default function HomeClient() {
         void buscar({ p: "", m: "" });
       },
       () => setGeoError("Geolocalización denegada. Activa el permiso o busca por municipio."),
-      { enableHighAccuracy: true, timeout: 10_000 },
+      { enableHighAccuracy: true, timeout: 10_000 }
     );
   };
 
@@ -104,7 +121,9 @@ export default function HomeClient() {
       });
       setData(res);
     } catch {
-      setError("No se pudo contactar con el Ministerio (MITERD). Comprueba tu conexión y reintenta.");
+      setError(
+        "No se pudo contactar con el Ministerio (MITERD). Comprueba tu conexión y reintenta."
+      );
     } finally {
       setLoading(false);
     }
@@ -121,7 +140,8 @@ export default function HomeClient() {
     let arr = data.estaciones.map((g) => ({
       g,
       precio: precioDe(g, producto, nombreProducto),
-      dist: g.lat != null && g.lng != null && loc ? haversineKm(loc.lat, loc.lng, g.lat, g.lng) : null,
+      dist:
+        g.lat != null && g.lng != null && loc ? haversineKm(loc.lat, loc.lng, g.lat, g.lng) : null,
     }));
     if (ocultarSinPrecio) arr = arr.filter((x) => x.precio != null);
     if (solo24h) arr = arr.filter((x) => es24h(x.g.horario));
@@ -130,7 +150,7 @@ export default function HomeClient() {
     arr.sort((a, b) =>
       orden === "precio"
         ? (a.precio ?? Infinity) - (b.precio ?? Infinity)
-        : (a.dist ?? Infinity) - (b.dist ?? Infinity),
+        : (a.dist ?? Infinity) - (b.dist ?? Infinity)
     );
     return arr;
   }, [data, producto, nombreProducto, loc, radio, orden, solo24h, ocultarSinPrecio, soloFav, favs]);
@@ -141,90 +161,136 @@ export default function HomeClient() {
 
   return (
     <div className="space-y-4">
-      <section className="rounded-2xl bg-gradient-to-br from-energia-600 to-energia-800 p-5 text-white sm:p-6">
-        <h1 className="text-2xl font-extrabold sm:text-3xl">La gasolina más barata, cerca de ti</h1>
-        <p className="mt-1 text-white/90">
-          Precios oficiales del Ministerio, actualizados a diario. Sin registro y gratis.
-        </p>
+      <section className="gc-ticket overflow-hidden rounded-ticket bg-tinta text-papel">
+        <div className="border-b-2 border-dashed border-papel/25 px-5 pb-4 pt-5 sm:px-6">
+          <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-energia-300">
+            Poste de precios · Datos MITERD
+          </p>
+          <h1 className="gc-display mt-1 break-words font-display text-3xl uppercase leading-[0.95] sm:text-5xl">
+            La mas barata, <span className="text-energia-300">cerca de ti</span>
+          </h1>
+          <p className="mt-2 max-w-xl text-sm text-papel/80">
+            Precios oficiales del Ministerio, actualizados a diario. Sin registro y gratis.
+          </p>
+        </div>
+        <div className="flex flex-wrap items-center gap-2 px-5 py-3 text-xs font-bold uppercase tracking-widest sm:px-6">
+          <span className="rounded-md bg-energia-600 px-2 py-1 text-white">MITERD oficial</span>
+          <span className="rounded-md bg-papel/10 px-2 py-1 text-papel/80">Sin registro</span>
+          <span className="rounded-md bg-papel/10 px-2 py-1 text-papel/80">Gratis</span>
+        </div>
       </section>
 
       {data && (
-        <p className="rounded-xl bg-neutral-100 px-3 py-2 text-sm dark:bg-neutral-900" role="status">
-          📅 Actualización del Ministerio: <strong>{data.fecha || "—"}</strong> · {data.count} estaciones
-          {data.stale && (
-            <span className="ml-2 rounded bg-amber-200 px-2 py-0.5 text-amber-900">
-              Aviso: el Ministerio falla ahora mismo; mostramos datos de hace {data.staleHours} h
-            </span>
-          )}
-        </p>
+        <Alert tono={data.stale ? "warning" : "info"}>
+          <p>
+            📅 Actualización del Ministerio: <strong className="gc-num">{data.fecha || "—"}</strong>{" "}
+            · <span className="gc-num">{data.count}</span> estaciones
+            {data.stale && (
+              <span className="ml-2 rounded-md border-2 border-tinta bg-white px-2 py-0.5 font-bold text-tinta">
+                Aviso: el Ministerio falla ahora mismo; mostramos datos de hace {data.staleHours} h
+              </span>
+            )}
+          </p>
+        </Alert>
       )}
       {geoError && (
-        <p className="rounded-xl bg-amber-100 px-3 py-2 text-sm text-amber-900" role="alert">
-          ⚠️ {geoError}
-        </p>
+        <Alert tono="warning">
+          <p>⚠️ {geoError}</p>
+        </Alert>
       )}
 
-      <section aria-label="Filtros de búsqueda" className="grid gap-3 rounded-2xl border border-neutral-200 p-4 dark:border-neutral-800">
+      <Card aria-label="Filtros de búsqueda" className="grid gap-4 p-4 sm:p-5">
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          <label className="grid gap-1 text-sm">
-            Carburante
-            <select
-              className="rounded-lg border border-neutral-300 bg-white p-2 dark:border-neutral-700 dark:bg-neutral-900"
+          <Field label="Carburante">
+            <FieldSelect
               value={producto}
               onChange={(e) => {
                 const id = e.target.value;
                 setProducto(id);
-                setNombreProducto(etiquetaProducto(id, productos.find((p) => p.IDProducto === id)?.NombreProducto));
+                setNombreProducto(
+                  etiquetaProducto(id, productos.find((p) => p.IDProducto === id)?.NombreProducto)
+                );
                 buscarDebounced({ pr: id });
               }}
             >
-              {(productos.length ? productos : [{ IDProducto: "1", NombreProducto: "Gasolina 95 E5", NombreProductoAbreviatura: "" }, { IDProducto: "4", NombreProducto: "Gasóleo A", NombreProductoAbreviatura: "" }]).map((p) => (
+              {(productos.length
+                ? productos
+                : [
+                    {
+                      IDProducto: "1",
+                      NombreProducto: "Gasolina 95 E5",
+                      NombreProductoAbreviatura: "",
+                    },
+                    { IDProducto: "4", NombreProducto: "Gasóleo A", NombreProductoAbreviatura: "" },
+                  ]
+              ).map((p) => (
                 <option key={p.IDProducto} value={p.IDProducto}>
                   {p.NombreProducto}
                 </option>
               ))}
-            </select>
-          </label>
-          <label className="grid gap-1 text-sm">
-            Provincia
-            <select
-              className="rounded-lg border border-neutral-300 bg-white p-2 dark:border-neutral-700 dark:bg-neutral-900"
+            </FieldSelect>
+          </Field>
+          <Field label="Provincia">
+            <FieldSelect
               value={idProv}
-              onChange={(e) => { setIdProv(e.target.value); setIdMuni(""); setLoc(null); buscarDebounced({ p: e.target.value }); }}
+              onChange={(e) => {
+                setIdProv(e.target.value);
+                setIdMuni("");
+                setLoc(null);
+                buscarDebounced({ p: e.target.value });
+              }}
             >
               <option value="">Todas</option>
               {provincias.map((p) => (
-                <option key={p.IDPovincia} value={p.IDPovincia}>{p.Provincia}</option>
+                <option key={p.IDPovincia} value={p.IDPovincia}>
+                  {p.Provincia}
+                </option>
               ))}
-            </select>
-          </label>
-          <label className="grid gap-1 text-sm">
-            Municipio
-            <select
-              className="rounded-lg border border-neutral-300 bg-white p-2 dark:border-neutral-700 dark:bg-neutral-900"
+            </FieldSelect>
+          </Field>
+          <Field label="Municipio">
+            <FieldSelect
               value={idMuni}
               disabled={!idProv}
-              onChange={(e) => { setIdMuni(e.target.value); setLoc(null); buscarDebounced({ p: idProv, m: e.target.value }); }}
+              onChange={(e) => {
+                setIdMuni(e.target.value);
+                setLoc(null);
+                buscarDebounced({ p: idProv, m: e.target.value });
+              }}
             >
               <option value="">Todos</option>
               {municipios.map((m) => (
-                <option key={m.IDMunicipio} value={m.IDMunicipio}>{m.Municipio}</option>
+                <option key={m.IDMunicipio} value={m.IDMunicipio}>
+                  {m.Municipio}
+                </option>
               ))}
-            </select>
-          </label>
+            </FieldSelect>
+          </Field>
         </div>
 
         <div className="flex flex-wrap items-center gap-2 text-sm">
-          <button onClick={usarUbicacion} className="rounded-full bg-energia-600 px-4 py-2 font-semibold text-white hover:bg-energia-700">
+          <Button
+            variante="primary"
+            onClick={usarUbicacion}
+            className="min-h-[44px] w-full sm:w-auto"
+          >
             📍 Usar mi ubicación
-          </button>
-          <div role="group" aria-label="Radio de búsqueda en kilómetros" className="flex flex-wrap gap-1">
+          </Button>
+          <div
+            role="group"
+            aria-label="Radio de búsqueda en kilómetros"
+            className="flex flex-wrap gap-1.5"
+          >
             {RADIOS.map((r) => (
               <button
                 key={r}
                 onClick={() => setRadio(r)}
                 aria-pressed={radio === r}
-                className={`rounded-full border px-3 py-1 ${radio === r ? "border-energia-600 bg-energia-100 font-bold dark:bg-energia-900" : "border-neutral-300 dark:border-neutral-700"}`}
+                className={`gc-press rounded-full border-2 px-3 py-1 font-mono text-sm ${
+                  radio === r
+                    ? "border-tinta bg-tinta text-white shadow-sticker"
+                    : "border-neutral-300 bg-white dark:border-neutral-700 dark:bg-neutral-900"
+                }`}
               >
                 {r} km
               </button>
@@ -235,76 +301,172 @@ export default function HomeClient() {
               Mostrando a menos de {radio} km de ti
             </span>
           )}
-          <label className="ml-1 flex items-center gap-1">
+          <label className="ml-1 flex items-center gap-1.5 text-xs font-bold uppercase tracking-widest text-neutral-500">
             Orden
-            <select value={orden} onChange={(e) => setOrden(e.target.value as Orden)} className="rounded-lg border border-neutral-300 bg-white p-1.5 dark:border-neutral-700 dark:bg-neutral-900">
+            <select
+              value={orden}
+              onChange={(e) => setOrden(e.target.value as Orden)}
+              className="rounded-xl border-2 border-tinta bg-white px-2 py-1.5 text-sm normal-case shadow-sticker dark:border-neutral-600 dark:bg-neutral-900"
+            >
               <option value="precio">Más baratas</option>
               <option value="distancia">Más cercanas</option>
             </select>
           </label>
-          <button onClick={() => void buscar()} disabled={loading} className="rounded-full bg-neutral-900 px-5 py-2 font-semibold text-white disabled:opacity-50 dark:bg-white dark:text-neutral-900">
+          <Button
+            variante="dark"
+            onClick={() => void buscar()}
+            disabled={loading}
+            className="min-h-[44px] w-full sm:w-auto"
+          >
             {loading ? "Buscando…" : "Buscar"}
+          </Button>
+        </div>
+
+        <div className="flex flex-wrap gap-3 border-t-2 border-dashed border-tinta/20 pt-3 text-sm">
+          <label className="flex cursor-pointer items-center gap-1.5">
+            <input
+              type="checkbox"
+              checked={solo24h}
+              onChange={(e) => setSolo24h(e.target.checked)}
+              className="h-4 w-4 accent-green-700"
+            />{" "}
+            Solo 24 h
+          </label>
+          <label className="flex cursor-pointer items-center gap-1.5">
+            <input
+              type="checkbox"
+              checked={ocultarSinPrecio}
+              onChange={(e) => setOcultarSinPrecio(e.target.checked)}
+              className="h-4 w-4 accent-green-700"
+            />{" "}
+            Ocultar sin precio
+          </label>
+          <label className="flex cursor-pointer items-center gap-1.5">
+            <input
+              type="checkbox"
+              checked={soloFav}
+              onChange={(e) => setSoloFav(e.target.checked)}
+              className="h-4 w-4 accent-green-700"
+            />{" "}
+            ⭐ Solo favoritas
+          </label>
+        </div>
+      </Card>
+
+      {loading && (
+        <div
+          role="status"
+          className="gc-ticket rounded-ticket bg-white p-6 text-center dark:bg-neutral-950"
+        >
+          <p className="font-display uppercase tracking-wide">⏳ Cargando precios oficiales…</p>
+        </div>
+      )}
+      {error && (
+        <Alert tono="danger">
+          <p>{error}</p>
+          <button onClick={() => void buscar()} className="ml-auto font-bold underline">
+            Reintentar
           </button>
-        </div>
-
-        <div className="flex flex-wrap gap-3 text-sm">
-          <label className="flex items-center gap-1.5"><input type="checkbox" checked={solo24h} onChange={(e) => setSolo24h(e.target.checked)} className="h-4 w-4 accent-green-600" /> Solo 24 h</label>
-          <label className="flex items-center gap-1.5"><input type="checkbox" checked={ocultarSinPrecio} onChange={(e) => setOcultarSinPrecio(e.target.checked)} className="h-4 w-4 accent-green-600" /> Ocultar sin precio</label>
-          <label className="flex items-center gap-1.5"><input type="checkbox" checked={soloFav} onChange={(e) => setSoloFav(e.target.checked)} className="h-4 w-4 accent-green-600" /> ⭐ Solo favoritas</label>
-        </div>
-      </section>
-
-      {loading && <p role="status" className="py-6 text-center">⏳ Cargando precios oficiales…</p>}
-      {error && <p role="alert" className="rounded-xl bg-red-100 px-3 py-2 text-red-900">{error}</p>}
+        </Alert>
+      )}
 
       {!loading && !error && data && lista.length === 0 && (
-        <p className="rounded-xl border border-dashed border-neutral-300 p-6 text-center dark:border-neutral-700" role="status">
-          Sin resultados con esos filtros. Prueba con más radio o quita “solo 24 h”.
-        </p>
+        <Empty
+          icono="🛣️"
+          titulo="Sin resultados"
+          texto="Prueba con más radio o quita “solo 24 h”."
+        />
       )}
       {!loading && !error && !data && (
-        <p className="rounded-xl border border-dashed border-neutral-300 p-6 text-center text-neutral-600 dark:border-neutral-700 dark:text-neutral-400">
-          Elige provincia/municipio o pulsa <strong>Buscar</strong> para ver precios reales del Ministerio.
-        </p>
+        <Empty
+          icono="⛽"
+          titulo="Elige y busca"
+          texto={
+            <>
+              Elige provincia/municipio o pulsa <strong>Buscar</strong> para ver precios reales del
+              Ministerio.
+            </>
+          }
+        />
       )}
 
       {lista.length > 0 && (
         <div className="grid gap-4 lg:grid-cols-2">
-          <section aria-label="Mapa de gasolineras" className="lg:sticky lg:top-16 lg:self-start">
-            <Mapa puntos={lista.slice(0, 200).map((x) => ({ g: x.g, precio: x.precio, dist: x.dist }))} loc={loc} idBarata={masBarata?.g.ideess} ajustarKey={ajustarKey} onCentrar={usarUbicacion} />
+          <section aria-label="Mapa de gasolineras" className="lg:sticky lg:top-24 lg:self-start">
+            <Mapa
+              puntos={lista.slice(0, 200).map((x) => ({ g: x.g, precio: x.precio, dist: x.dist }))}
+              loc={loc}
+              idBarata={masBarata?.g.ideess}
+              ajustarKey={ajustarKey}
+              onCentrar={usarUbicacion}
+            />
           </section>
           <section aria-label="Lista de gasolineras">
-            <h2 className="mb-2 text-lg font-bold">
-              {lista.length} gasolineras {loc ? `a menos de ${radio} km` : ""}
+            <h2 className="mb-2 font-display text-xl uppercase tracking-wide">
+              <span className="gc-num">{lista.length}</span> gasolineras{" "}
+              {loc ? `a menos de ${radio} km` : ""}
             </h2>
             <ul className="space-y-3">
               {lista.slice(0, visibles).map(({ g, precio, dist }) => {
                 const esBarata = masBarata?.g.ideess === g.ideess;
                 const fav = favs.includes(g.ideess);
                 return (
-                  <li key={g.ideess} className={`rounded-2xl border p-3 ${esBarata ? "border-energia-500 ring-2 ring-energia-400" : "border-neutral-200 dark:border-neutral-800"}`}>
+                  <li
+                    key={g.ideess}
+                    className={`gc-ticket rounded-ticket p-3 ${esBarata ? "bg-energia-50 dark:bg-energia-900/30" : "bg-white dark:bg-neutral-950"}`}
+                  >
                     <div className="flex items-start justify-between gap-2">
-                      <div>
-                        <p className="font-bold">
-                          {esBarata && <span className="mr-1 rounded bg-energia-600 px-1.5 py-0.5 text-xs text-white">MÁS BARATA</span>}
+                      <div className="min-w-0">
+                        <p className="font-bold leading-tight">
+                          {esBarata && (
+                            <span className="gc-sticker mr-2 inline-block rounded-md bg-energia-600 px-1.5 py-0.5 align-middle text-[11px] font-bold uppercase tracking-widest text-white">
+                              Más barata
+                            </span>
+                          )}
                           {g.rotulo}
                         </p>
-                        <p className="text-sm text-neutral-600 dark:text-neutral-400">{g.direccion} · {g.municipio} ({g.provincia})</p>
-                        <p className="text-xs text-neutral-500">🕒 {g.horario || "—"}{dist != null && <> · 📍 {fmtDist(dist)}</>}</p>
+                        <p className="mt-0.5 text-sm text-neutral-600 dark:text-neutral-400">
+                          {g.direccion} · {g.municipio} ({g.provincia})
+                        </p>
+                        <p className="mt-0.5 text-xs text-neutral-500">
+                          🕒 {g.horario || "—"}
+                          {dist != null && (
+                            <>
+                              {" "}
+                              · 📍 <span className="gc-num font-mono">{fmtDist(dist)}</span>
+                            </>
+                          )}
+                        </p>
                       </div>
-                      <p className="text-right text-2xl font-extrabold text-energia-700 dark:text-energia-300" aria-label={`Precio ${fmtPrecio(precio)}`}>
+                      <p
+                        className="gc-num shrink-0 text-right font-mono text-xl font-bold text-energia-700 dark:text-energia-300 sm:text-2xl"
+                        aria-label={`Precio ${fmtPrecio(precio)}`}
+                      >
                         {fmtPrecio(precio)}
                       </p>
                     </div>
-                    <div className="mt-2 flex flex-wrap gap-2 text-sm">
-                      <Link href={`/estacion/${g.ideess}?provincia=${g.idProvincia}`} className="rounded-full border border-neutral-300 px-3 py-1 hover:underline dark:border-neutral-700">
+                    <div className="mt-2 flex flex-wrap gap-2 border-t-2 border-dashed border-tinta/15 pt-2 text-sm">
+                      <Link
+                        href={`/estacion/${g.ideess}?provincia=${g.idProvincia}`}
+                        className="gc-press rounded-full border-2 border-tinta bg-white px-3 py-1 font-semibold shadow-sticker dark:border-neutral-600 dark:bg-neutral-900"
+                      >
                         Ver detalle
                       </Link>
-                      <button onClick={() => setFavs(toggleFavorito(g.ideess))} aria-pressed={fav} aria-label={fav ? "Quitar de favoritas" : "Guardar en favoritas"} className="rounded-full border border-neutral-300 px-3 py-1 dark:border-neutral-700">
+                      <button
+                        onClick={() => setFavs(toggleFavorito(g.ideess))}
+                        aria-pressed={fav}
+                        aria-label={fav ? "Quitar de favoritas" : "Guardar en favoritas"}
+                        className="gc-press rounded-full border-2 border-tinta bg-white px-3 py-1 shadow-sticker dark:border-neutral-600 dark:bg-neutral-900"
+                      >
                         {fav ? "★ Guardada" : "☆ Guardar"}
                       </button>
-                      <a href={enlaceWhatsApp(g.rotulo, fmtPrecio(precio), g.direccion)} target="_blank" rel="noopener noreferrer" className="rounded-full border border-neutral-300 px-3 py-1 dark:border-neutral-700">
-                        Compartir por WhatsApp
+                      <a
+                        href={enlaceWhatsApp(g.rotulo, fmtPrecio(precio), g.direccion)}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="gc-press rounded-full border-2 border-tinta bg-energia-600 px-3 py-1 font-semibold text-white shadow-sticker"
+                      >
+                        Compartir
                       </a>
                     </div>
                   </li>
@@ -312,9 +474,13 @@ export default function HomeClient() {
               })}
             </ul>
             {visibles < lista.length && (
-              <button onClick={() => setVisibles((v) => v + PAGE)} className="mt-3 w-full rounded-xl border border-neutral-300 p-3 font-semibold dark:border-neutral-700">
+              <Button
+                variante="ghost"
+                onClick={() => setVisibles((v) => v + PAGE)}
+                className="mt-3 w-full"
+              >
                 Mostrar más ({lista.length - visibles} restantes)
-              </button>
+              </Button>
             )}
           </section>
         </div>

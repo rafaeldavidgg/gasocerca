@@ -1,10 +1,8 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-  <rect width="64" height="64" rx="14" fill="#16a34a"/>
-  <g transform="translate(19 12) scale(1.5)" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
-    <rect x="1" y="1" width="9" height="13" rx="1.5"/>
-    <path d="M10 5h2.5a1.5 1.5 0 0 1 1.5 1.5V12"/>
-    <circle cx="5.5" cy="8" r="1.6"/>
-    <path d="M4 14v2.5M7 14v2.5"/>
-  </g>
-  <circle cx="32" cy="52" r="3" fill="#ffd23f"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="GasoCerca">
+  <rect width="64" height="64" rx="14" fill="#141a13"/>
+  <rect x="22" y="12" width="20" height="24" rx="3" fill="#16a34a"/>
+  <rect x="26" y="16" width="6" height="9" rx="1.5" fill="#faf6ec"/>
+  <path d="M42 19h4a2 2 0 0 1 2 2v9" fill="none" stroke="#faf6ec" stroke-width="3" stroke-linecap="round"/>
+  <rect x="28" y="36" width="8" height="4" rx="1.5" fill="#faf6ec"/>
+  <circle cx="32" cy="49" r="4" fill="#faf6ec"/>
 </svg>

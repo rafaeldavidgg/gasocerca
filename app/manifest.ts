@@ -7,7 +7,7 @@ export default function manifest(): MetadataRoute.Manifest {
     description: "Precios oficiales de carburantes y la gasolinera más barata cerca de ti.",
     start_url: "/",
     display: "standalone",
-    background_color: "#ffffff",
+    background_color: "#faf6ec",
     theme_color: "#16a34a",
     icons: [{ src: "/favicon.svg", sizes: "any", type: "image/svg+xml" }],
   };

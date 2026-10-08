@@ -2,62 +2,150 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Tokens semanticos en OKLCH (fuente unica de verdad, Tailwind los referencia) */
 :root {
   color-scheme: light;
+  --gc-paper: oklch(0.97 0.02 95);
+  --gc-ink: oklch(0.22 0.03 140);
+  --gc-accent: oklch(0.62 0.17 145);
+  --gc-accent-ink: oklch(0.32 0.1 145);
+  --gc-success: oklch(0.62 0.17 145);
+  --gc-warning: oklch(0.7 0.15 60);
+  --gc-danger: oklch(0.6 0.2 25);
+  --gc-line: oklch(0.85 0.02 95);
+  --gc-muted: oklch(0.55 0.02 140);
 }
 
 .dark {
   color-scheme: dark;
+  --gc-paper: oklch(0.2 0.03 140);
+  --gc-ink: oklch(0.95 0.02 95);
+  --gc-accent: oklch(0.72 0.17 145);
+  --gc-accent-ink: oklch(0.9 0.1 145);
+  --gc-success: oklch(0.72 0.17 145);
+  --gc-warning: oklch(0.78 0.14 60);
+  --gc-danger: oklch(0.7 0.18 25);
+  --gc-line: oklch(0.32 0.03 140);
+  --gc-muted: oklch(0.7 0.03 140);
 }
 
 body {
-  @apply bg-white text-neutral-900 antialiased dark:bg-neutral-950 dark:text-neutral-100;
+  @apply bg-papel text-tinta antialiased dark:bg-papel-oscuro dark:text-neutral-100;
+  background-image: repeating-linear-gradient(
+    -45deg,
+    transparent 0 14px,
+    rgb(20 26 19 / 0.015) 14px 15px
+  );
 }
 
-/* Mejora foco visible para accesibilidad AA */
+.dark body {
+  background-image: repeating-linear-gradient(
+    -45deg,
+    transparent 0 14px,
+    rgb(255 255 255 / 0.02) 14px 15px
+  );
+}
+
+::selection {
+  background: #e1f6dc;
+  color: #141a13;
+}
+
+/* Foco visible AA */
 :focus-visible {
-  outline: 3px solid #3daa34;
+  outline: 3px solid #2c8826;
   outline-offset: 2px;
+  border-radius: 4px;
+}
+
+.dark :focus-visible {
+  outline-color: #9bdd92;
+}
+
+/* Numeros tabulares para precios */
+.gc-num {
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+}
+
+/* Titulares editoriales */
+.gc-display {
+  text-wrap: balance;
+  letter-spacing: -0.01em;
+}
+
+/* Tarjeta ticket: borde tinta + sombra dura + separador discontinuo */
+.gc-ticket {
+  border: 2px solid #141a13;
+  box-shadow: 2px 2px 0 0 #141a13;
+}
+
+.dark .gc-ticket {
+  border-color: oklch(0.45 0.04 140);
+  box-shadow: 2px 2px 0 0 oklch(0.45 0.04 140);
+}
+
+.gc-ticket-dash {
+  border-top: 2px dashed rgb(20 26 19 / 0.25);
+}
+
+/* Pegatina ganadora */
+.gc-sticker {
+  box-shadow: 2px 2px 0 0 #141a13;
+  transform: rotate(-1.5deg);
+}
+
+/* Press feedback utilitario */
+.gc-press {
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease,
+    background-color 0.15s ease;
+}
+
+.gc-press:active {
+  transform: scale(0.97);
 }
 
 .leaflet-container {
   font: inherit;
 }
 
-/* ---------- Pines propios de GasoCerca (divIcon, sin imágenes) ---------- */
+/* ---------- Pines senal de GasoCerca (divIcon, sin imagenes) ---------- */
 
-/* Contenedor que genera Leaflet: transparente para no deformar el pin */
 .gc-divicon {
   background: transparent;
   border: none;
 }
 
-/* Píldora de precio con puntita inferior tipo pin de mapa */
+/* Pildora-senial blanca con borde tinta grueso y punta */
 .gc-pin {
   position: relative;
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  background: #fff;
-  color: #18181b;
-  border: 2px solid #525252;
+  gap: 5px;
+  background: #fffdf4;
+  color: #141a13;
+  border: 2.5px solid #141a13;
   border-radius: 9999px;
-  padding: 4px 10px;
-  font-size: 12px;
-  font-weight: 800;
+  padding: 5px 11px;
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 12.5px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
   line-height: 1.2;
   white-space: nowrap;
-  box-shadow: 0 1px 6px rgb(0 0 0 / 0.35);
+  box-shadow: 2px 2px 0 0 #141a13;
 }
 
 .gc-pin::after {
   content: "";
   position: absolute;
   left: 50%;
-  bottom: -8px;
+  bottom: -9px;
   transform: translateX(-50%);
-  border: 8px solid transparent;
-  border-top-color: #525252;
+  border: 9px solid transparent;
+  border-top-color: #141a13;
   border-bottom: 0;
 }
 
@@ -66,27 +154,28 @@ body {
   line-height: 1;
 }
 
-/* Ganadora: verde energía + estrella amarilla, algo más grande y con halo */
+/* Ganadora: verde energia + estrella senal, mas grande y con halo */
 .gc-pin-ganadora {
   background: #16a34a;
-  border-color: #14532d;
+  border-color: #0d3b1e;
   color: #fff;
-  font-size: 13px;
-  padding: 5px 12px;
+  font-size: 13.5px;
+  padding: 6px 13px;
   box-shadow:
-    0 0 0 3px rgb(22 163 74 / 0.3),
+    0 0 0 3px rgb(22 163 74 / 0.35),
+    2px 2px 0 0 #0d3b1e,
     0 2px 8px rgb(0 0 0 / 0.4);
 }
 
 .gc-pin-ganadora::after {
-  border-top-color: #14532d;
+  border-top-color: #0d3b1e;
 }
 
 .gc-pin-ganadora .gc-pin-ico {
-  color: #ffd23f;
+  color: #fff;
 }
 
-/* Punto azul pulsante de "estás aquí" */
+/* Punto azul pulsante de "estas aqui" */
 .gc-user {
   position: relative;
   width: 28px;
@@ -121,28 +210,23 @@ body {
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .gc-user-halo {
-    animation: none;
-  }
-}
-
 /* Mini leyenda bajo el mapa */
 .gc-legend {
   display: inline-grid;
   place-items: center;
-  width: 20px;
-  height: 20px;
+  width: 22px;
+  height: 22px;
   border-radius: 9999px;
-  background: #fff;
-  border: 2px solid #525252;
+  background: #fffdf4;
+  border: 2.5px solid #141a13;
   font-size: 10px;
+  box-shadow: 1.5px 1.5px 0 0 #141a13;
 }
 
 .gc-legend-ganadora {
   background: #16a34a;
-  border-color: #14532d;
-  color: #ffd23f;
+  border-color: #0d3b1e;
+  color: #fff;
 }
 
 .gc-legend-user {
@@ -153,4 +237,15 @@ body {
   background: #2563eb;
   border: 3px solid #fff;
   box-shadow: 0 0 0 1px #2563eb;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gc-user-halo {
+    animation: none;
+  }
+  .gc-press,
+  .gc-sticker {
+    transition: none;
+    transform: none;
+  }
 }
